@@ -8,12 +8,10 @@ from itertools import combinations
 # --------------------
 @st.cache_data(show_spinner="Fetching league data from Sleeper...")
 def load_league_data(league_id, ktc_df):
-    # Load Sleeper player pool
     player_pool_url = "https://api.sleeper.app/v1/players/nfl"
     pool_response = requests.get(player_pool_url)
     player_pool = pool_response.json()
 
-    # Load league users and rosters
     users_url = f"https://api.sleeper.app/v1/league/{league_id}/users"
     rosters_url = f"https://api.sleeper.app/v1/league/{league_id}/rosters"
     users = requests.get(users_url).json()
@@ -72,10 +70,31 @@ def stud_bonus(value):
     return 0
 
 # --------------------
-# Sidebar: League Input
+# Sidebar: User & League Picker
 # --------------------
 st.sidebar.header("Import Your League")
-league_id = st.sidebar.text_input("Enter your Sleeper League ID")
+
+username = st.sidebar.text_input("Enter your Sleeper username")
+league_id = None
+league_options = {}
+
+if username:
+    try:
+        leagues_url = f"https://api.sleeper.app/v1/user/{username}/leagues/nfl/2024"
+        leagues = requests.get(leagues_url).json()
+
+        if leagues:
+            for league in leagues:
+                name = league["name"]
+                lid = league["league_id"]
+                league_options[name] = lid
+
+            selected_league_name = st.sidebar.selectbox("Select a league", list(league_options.keys()))
+            league_id = league_options[selected_league_name]
+        else:
+            st.sidebar.warning("No leagues found for this username.")
+    except Exception as e:
+        st.sidebar.error(f"Error fetching leagues: {e}")
 
 # Load local KTC values
 ktc_df = pd.read_csv("ktc_values.csv", encoding="utf-8-sig")
@@ -152,4 +171,4 @@ if not df.empty:
         else:
             st.markdown("No good 2-for-1 trade suggestions found.")
 else:
-    st.info("Enter your Sleeper League ID in the sidebar to get started.")
+    st.info("Enter your Sleeper username in the sidebar to get started.")
