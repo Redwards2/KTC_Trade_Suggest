@@ -33,10 +33,6 @@ try:
                 full_name = player_data.get("full_name", pid)
                 position = player_data.get("position", "PICK" if "pick" in pid else "")
                 team = player_data.get("team", "")
-                    continue
-                full_name = player_data.get("full_name", pid)
-                position = player_data.get("position", "")
-                team = player_data.get("team", "")
                 data.append({
                     "Sleeper_Player_ID": pid,
                     "Player_Sleeper": full_name,
