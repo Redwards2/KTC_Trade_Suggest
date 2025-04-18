@@ -29,8 +29,10 @@ try:
             player_ids = roster.get("players", [])
 
             for pid in player_ids:
-                player_data = player_pool.get(pid)
-                if not player_data:
+                player_data = player_pool.get(pid, {})
+                full_name = player_data.get("full_name", pid)
+                position = player_data.get("position", "PICK" if "pick" in pid else "")
+                team = player_data.get("team", "")
                     continue
                 full_name = player_data.get("full_name", pid)
                 position = player_data.get("position", "")
