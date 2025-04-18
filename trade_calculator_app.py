@@ -105,6 +105,7 @@ if not df.empty:
 
         st.subheader("Selected Player Details")
         st.markdown(f"- **Player:** {selected_player}")
+        st.markdown(f"- **Team Owner:** {owner}")
         st.markdown(f"- **Raw KTC Value:** {base_value}")
         st.markdown(f"- **Stud Bonus (2-for-1 only):** +{bonus}")
         st.markdown(f"- **Adjusted 2-for-1 Value:** {adjusted_value}")
