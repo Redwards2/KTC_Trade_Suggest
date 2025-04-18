@@ -80,7 +80,14 @@ league_options = {}
 
 if username:
     try:
-        leagues_url = f"https://api.sleeper.app/v1/user/{username}/leagues/nfl/2024"
+        user_info_url = f"https://api.sleeper.app/v1/user/{username}"
+        with st.spinner("🔍 Looking up user ID..."):
+            user_response = requests.get(user_info_url, timeout=10)
+            user_response.raise_for_status()
+            user_data = user_response.json()
+            user_id = user_data.get("user_id")
+
+        leagues_url = f"https://api.sleeper.app/v1/user/{user_id}/leagues/nfl/2024"
         with st.spinner("🔍 Looking up leagues..."):
             response = requests.get(leagues_url, timeout=10)
             response.raise_for_status()
