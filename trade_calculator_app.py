@@ -97,12 +97,17 @@ try:
 
             if leagues:
                 for league in leagues:
+                    if league.get("settings", {}).get("type", "redraft") != "dynasty":
+                        continue
                     name = league["name"]
                     lid = league["league_id"]
                     league_options[name] = lid
 
-                selected_league_name = st.sidebar.selectbox("Select a league", list(league_options.keys()))
-                league_id = league_options[selected_league_name]
+                if league_options:
+                    selected_league_name = st.sidebar.selectbox("Select a dynasty league", list(league_options.keys()))
+                    league_id = league_options[selected_league_name]
+                else:
+                    st.sidebar.warning("No dynasty leagues found for this username.")
             else:
                 st.sidebar.warning("No leagues found for this username.")
         except requests.exceptions.Timeout:
