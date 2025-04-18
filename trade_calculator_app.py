@@ -95,13 +95,9 @@ try:
                 response.raise_for_status()
                 leagues = response.json()
 
-            include_only_dynasty = st.sidebar.checkbox("Only show leagues with 'dynasty' in the name", value=True)
-
             if leagues:
                 for league in leagues:
                     name = league["name"]
-                    if include_only_dynasty and "dynasty" not in name.lower():
-                        continue
                     lid = league["league_id"]
                     league_options[name] = lid
 
@@ -109,7 +105,7 @@ try:
                     selected_league_name = st.sidebar.selectbox("Select a league", list(league_options.keys()))
                     league_id = league_options[selected_league_name]
                 else:
-                    st.sidebar.warning("No matching leagues found for this username.")
+                    st.sidebar.warning("No leagues found for this username.")
             else:
                 st.sidebar.warning("No leagues found for this username.")
 
