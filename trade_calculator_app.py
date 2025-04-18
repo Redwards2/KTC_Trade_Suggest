@@ -133,19 +133,22 @@ try:
         player_list = user_players["Player_Sleeper"].sort_values().unique()
         selected_player = st.selectbox("Select a player to trade away:", player_list)
         tolerance = st.slider("Match Tolerance (%)", 1, 15, 5)
+        qb_premium_setting = st.slider("QB Premium Bonus", 0, 500, 300, step=25)
 
         if selected_player:
             row = df[df["Player_Sleeper"] == selected_player].iloc[0]
             owner = row["Team_Owner"]
             base_value = row["KTC_Value"]
             bonus = stud_bonus(base_value)
-            adjusted_value = base_value + bonus
+            qb_premium = qb_premium_setting if row["Position"] == "QB" else 0
+            adjusted_value = base_value + bonus + qb_premium
 
             st.subheader("Selected Player Details")
             st.markdown(f"- **Player:** {selected_player}")
             st.markdown(f"- **Team Owner:** {owner}")
             st.markdown(f"- **Raw KTC Value:** {base_value}")
             st.markdown(f"- **Stud Bonus (2-for-1 only):** +{bonus}")
+            st.markdown(f"- **QB Premium:** +{qb_premium if qb_premium else 0}")
             st.markdown(f"- **Adjusted 2-for-1 Value:** {adjusted_value}")
 
             # 1-for-1 Trades
@@ -177,6 +180,8 @@ try:
                 combos = combinations(team_players.iterrows(), 2)
                 for (i1, p1), (i2, p2) in combos:
                     total = p1["KTC_Value"] + p2["KTC_Value"]
+                    if p1["Position"] == "QB": total += qb_premium_setting
+                    if p2["Position"] == "QB": total += qb_premium_setting
                     if two_low <= total <= two_high:
                         results.append({
                             "Owner": team_owner,
