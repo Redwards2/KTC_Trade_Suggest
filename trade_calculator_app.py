@@ -112,7 +112,11 @@ try:
                     st.sidebar.warning("No matching leagues found for this username.")
             else:
                 st.sidebar.warning("No leagues found for this username.")
+
         except requests.exceptions.Timeout:
             st.sidebar.error("⚠️ Sleeper API timed out. Try again shortly.")
         except requests.exceptions.RequestException as e:
             st.sidebar.error(f"⚠️ Error fetching leagues: {e}")
+
+except Exception as e:
+    st.error(f"🚨 Something broke: {e}")
