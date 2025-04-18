@@ -73,15 +73,18 @@ def stud_bonus(value):
 # Sidebar: User & League Picker
 # --------------------
 st.sidebar.header("Import Your League")
-
 username = st.sidebar.text_input("Enter your Sleeper username")
+
 league_id = None
 league_options = {}
 
 if username:
     try:
         leagues_url = f"https://api.sleeper.app/v1/user/{username}/leagues/nfl/2024"
-        leagues = requests.get(leagues_url).json()
+        with st.spinner("🔍 Looking up leagues..."):
+            response = requests.get(leagues_url, timeout=10)
+            response.raise_for_status()
+            leagues = response.json()
 
         if leagues:
             for league in leagues:
@@ -93,12 +96,18 @@ if username:
             league_id = league_options[selected_league_name]
         else:
             st.sidebar.warning("No leagues found for this username.")
-    except Exception as e:
-        st.sidebar.error(f"Error fetching leagues: {e}")
+    except requests.exceptions.Timeout:
+        st.sidebar.error("⚠️ Sleeper API timed out. Try again shortly.")
+    except requests.exceptions.RequestException as e:
+        st.sidebar.error(f"⚠️ Error fetching leagues: {e}")
 
 # Load local KTC values
-ktc_df = pd.read_csv("ktc_values.csv", encoding="utf-8-sig")
-ktc_df = ktc_df[ktc_df["KTC_Value"] >= 2000]
+try:
+    ktc_df = pd.read_csv("ktc_values.csv", encoding="utf-8-sig")
+    ktc_df = ktc_df[ktc_df["KTC_Value"] >= 2000]
+except Exception as e:
+    st.error(f"Could not load KTC values: {e}")
+    st.stop()
 
 if league_id:
     df = load_league_data(league_id, ktc_df)
