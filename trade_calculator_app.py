@@ -89,7 +89,7 @@ try:
                 user_data = user_response.json()
                 user_id = user_data.get("user_id")
 
-            leagues_url = f"https://api.sleeper.app/v1/user/{user_id}/leagues/nfl/2024"
+            leagues_url = f"https://api.sleeper.app/v1/user/{user_id}/leagues/nfl/2025"
             with st.spinner("🔍 Looking up leagues..."):
                 response = requests.get(leagues_url, timeout=10)
                 response.raise_for_status()
