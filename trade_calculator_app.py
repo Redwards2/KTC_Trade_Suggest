@@ -56,17 +56,17 @@ try:
     # Stud Bonus Function
     # --------------------
     def stud_bonus(value):
-        if value >= 9000: return 3200
-        elif value >= 8500: return 2900
-        elif value >= 8000: return 2600
-        elif value >= 7500: return 2400
-        elif value >= 7000: return 2200
-        elif value >= 6500: return 2000
-        elif value >= 6000: return 1800
-        elif value >= 5000: return 1400
-        elif value >= 4000: return 1000
-        elif value >= 3000: return 700
-        elif value >= 2000: return 400
+        if value >= 9000: return 3450
+        elif value >= 8500: return 3150
+        elif value >= 8000: return 2850
+        elif value >= 7500: return 2650
+        elif value >= 7000: return 2450
+        elif value >= 6500: return 2250
+        elif value >= 6000: return 2050
+        elif value >= 5000: return 1650
+        elif value >= 4000: return 1250
+        elif value >= 3000: return 950
+        elif value >= 2000: return 650
         return 0
 
     # --------------------
