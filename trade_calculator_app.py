@@ -129,7 +129,8 @@ try:
     if not df.empty:
         st.title("Dynasty Trade Calculator (KTC Style)")
 
-        player_list = df["Player_Sleeper"].sort_values().unique()
+        user_players = df[df["Team_Owner"] == username]
+        player_list = user_players["Player_Sleeper"].sort_values().unique()
         selected_player = st.selectbox("Select a player to trade away:", player_list)
         tolerance = st.slider("Match Tolerance (%)", 1, 15, 5)
 
