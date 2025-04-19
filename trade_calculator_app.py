@@ -6,7 +6,7 @@ from itertools import combinations
 # --------------------
 # Sleeper League Loader
 # --------------------
-# @st.cache_data(show_spinner="Fetching league data from Sleeper...")
+    # @st.cache_data(show_spinner="Fetching league data from Sleeper...")
 def load_league_data(league_id, ktc_df):
         player_pool_url = "https://api.sleeper.app/v1/players/nfl"
         pool_response = requests.get(player_pool_url)
@@ -124,7 +124,7 @@ def load_league_data(league_id, ktc_df):
     # --------------------
     # Stud Bonus Function
     # --------------------
-    def stud_bonus(value):
+def stud_bonus(value):
         if value >= 9000: return 3450
         elif value >= 8500: return 3150
         elif value >= 8000: return 2850
