@@ -4,10 +4,10 @@ import requests
 from itertools import combinations
 
 # --------------------
-    # Sleeper League Loader
+# Sleeper League Loader
     # --------------------
     # @st.cache_data(show_spinner="Fetching league data from Sleeper...")
-    def load_league_data(league_id, ktc_df):
+def load_league_data(league_id, ktc_df):
         player_pool_url = "https://api.sleeper.app/v1/players/nfl"
         pool_response = requests.get(player_pool_url)
         player_pool = pool_response.json()
