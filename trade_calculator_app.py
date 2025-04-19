@@ -156,7 +156,7 @@ try:
                 st.sidebar.warning("No leagues found for this username.")
 
             # Load KTC values
-ktc_df = pd.read_csv("ktc_values.csv", encoding="utf-8-sig")
+            ktc_df = pd.read_csv("ktc_values.csv", encoding="utf-8-sig")
             st.write("✅ Loaded KTC values:", ktc_df.shape)
             # No filtering here so we don't drop draft picks
             # ktc_df = ktc_df[ktc_df["KTC_Value"] >= 2000]
