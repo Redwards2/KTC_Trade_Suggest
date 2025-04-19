@@ -3,9 +3,7 @@ import pandas as pd
 import requests
 from itertools import combinations
 
-try:
-
-    # --------------------
+# --------------------
     # Sleeper League Loader
     # --------------------
     # @st.cache_data(show_spinner="Fetching league data from Sleeper...")
@@ -198,7 +196,7 @@ try:
             st.error(f"🚨 Something broke while loading league data: {e}")
 
     # --------------------
-    # Main App Logic
+    try:
     # --------------------
     if not df.empty:
         st.title("Dynasty Trade Calculator (KTC Style)")
