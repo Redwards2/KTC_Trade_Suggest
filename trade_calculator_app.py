@@ -43,46 +43,54 @@ try:
                     "Roster_ID": roster_id
                 })
 
-            # Add draft picks
-            draft_picks = roster.get("draft_picks", [])
-            for pick in draft_picks:
-                season = pick.get("season")
-                round_num = pick.get("round")
-                pick_no = pick.get("order")
-                if not season or not round_num:
+            # Add draft picks using proper Sleeper API
+        picks_url = f"https://api.sleeper.app/v1/league/{league_id}/draft_picks"
+        picks_response = requests.get(picks_url)
+        picks_data = picks_response.json()
+
+        for pick in picks_data:
+            if pick.get("owner_id") != owner_id:
+                continue
+
+            season = pick.get("season")
+            round_num = pick.get("round")
+            pick_no = pick.get("pick")  # note: this is global pick number, not order in round
+
+            if not season or not round_num:
+                continue
+
+            # Format pick label for 2025 exact and 2026+ generic
+            if season == "2025" and pick_no is not None:
+                overall = int(pick_no)
+                pick_label = f"{season} Pick {round_num}.{(overall - 1) % 12 + 1:02d}"
+            else:
+                if round_num == 1:
+                    pick_label = f"{season} 1st"
+                elif round_num == 2:
+                    pick_label = f"{season} 2nd"
+                elif round_num == 3:
+                    pick_label = f"{season} 3rd"
+                elif round_num == 4:
+                    pick_label = f"{season} 4th"
+                else:
                     continue
 
-                # Format pick label for 2025 exact and 2026+ generic
-                if season == "2025" and pick_no is not None:
-                    pick_label = f"{season} Pick {round_num}.{int(pick_no):02d}"
-                else:
-                    if round_num == 1:
-                        pick_label = f"{season} 1st"
-                    elif round_num == 2:
-                        pick_label = f"{season} 2nd"
-                    elif round_num == 3:
-                        pick_label = f"{season} 3rd"
-                    elif round_num == 4:
-                        pick_label = f"{season} 4th"
-                    else:
-                        continue
+            # Assign static KTC values for future generic picks
+            manual_values = {
+                "2026 1st": 4716, "2026 2nd": 3064, "2026 3rd": 2159, "2026 4th": 1522,
+                "2027 1st": 4685, "2027 2nd": 2933, "2027 3rd": 1946, "2027 4th": 1356,
+            }
+            ktc_value = manual_values.get(pick_label)
 
-                # Assign static KTC values for future generic picks
-                manual_values = {
-                    "2026 1st": 4716, "2026 2nd": 3064, "2026 3rd": 2159, "2026 4th": 1522,
-                    "2027 1st": 4685, "2027 2nd": 2933, "2027 3rd": 1946, "2027 4th": 1356,
-                }
-                ktc_value = manual_values.get(pick_label)
-
-                data.append({
-                    "Sleeper_Player_ID": pick_label,
-                    "Player_Sleeper": pick_label,
-                    "Position": "PICK",
-                    "Team": "",
-                    "Team_Owner": owner_name,
-                    "Roster_ID": roster_id,
-                    "KTC_Value": ktc_value
-                })
+            data.append({
+                "Sleeper_Player_ID": pick_label,
+                "Player_Sleeper": pick_label,
+                "Position": "PICK",
+                "Team": "",
+                "Team_Owner": owner_name,
+                "Roster_ID": roster_id,
+                "KTC_Value": ktc_value
+            })
 
         df = pd.DataFrame(data)
         ktc_df["Player_Sleeper_lower"] = ktc_df["Player_Sleeper"].str.lower()
