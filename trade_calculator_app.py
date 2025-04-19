@@ -8,7 +8,7 @@ try:
     # --------------------
     # Sleeper League Loader
     # --------------------
-    @st.cache_data(show_spinner="Fetching league data from Sleeper...")
+    # @st.cache_data(show_spinner="Fetching league data from Sleeper...")
     def load_league_data(league_id, ktc_df):
         player_pool_url = "https://api.sleeper.app/v1/players/nfl"
         pool_response = requests.get(player_pool_url)
@@ -156,7 +156,8 @@ try:
                 st.sidebar.warning("No leagues found for this username.")
 
             # Load KTC values
-            ktc_df = pd.read_csv("ktc_values.csv", encoding="utf-8-sig")
+                        ktc_df = pd.read_csv("ktc_values.csv", encoding="utf-8-sig")
+            st.write("✅ Loaded KTC values:", ktc_df.shape)
             # No filtering here so we don't drop draft picks
             # ktc_df = ktc_df[ktc_df["KTC_Value"] >= 2000]
 
