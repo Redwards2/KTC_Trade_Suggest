@@ -145,12 +145,12 @@ def stud_bonus(value):
     # --------------------
 
 st.sidebar.header("Import Your League")
-    username = st.sidebar.text_input("Enter your Sleeper username").strip()
-    username_lower = username.lower()
+username = st.sidebar.text_input("Enter your Sleeper username").strip()
+username_lower = username.lower()
 
-    league_id = None
-    league_options = {}
-    df = pd.DataFrame()
+league_id = None
+league_options = {}
+df = pd.DataFrame()
 
     if username:
         try:
