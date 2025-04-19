@@ -196,7 +196,7 @@ from itertools import combinations
             st.error(f"🚨 Something broke while loading league data: {e}")
 
     # --------------------
-    try:
+try:
     # --------------------
     if not df.empty:
         st.title("Dynasty Trade Calculator (KTC Style)")
