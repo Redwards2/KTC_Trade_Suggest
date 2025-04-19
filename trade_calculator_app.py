@@ -61,12 +61,7 @@ try:
         except Exception as e:
             st.warning(f"⚠️ Could not load draft picks: {e}")
 
-        picks_by_owner = {}
-        for pick in picks_data:
-            owner = pick.get("owner_id")
-            if owner not in picks_by_owner:
-                picks_by_owner[owner] = []
-            picks_by_owner[owner].append(pick)
+        
 
         for roster in rosters:
             roster_id = roster["roster_id"]
