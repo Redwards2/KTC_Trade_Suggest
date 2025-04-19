@@ -152,7 +152,7 @@ league_id = None
 league_options = {}
 df = pd.DataFrame()
 
-    if username:
+if username:
         try:
             user_info_url = f"https://api.sleeper.app/v1/user/{username}"
             with st.spinner("🔍 Looking up user ID..."):
