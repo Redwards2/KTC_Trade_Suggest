@@ -57,6 +57,9 @@ def load_league_data(league_id, ktc_df):
                     picks_by_owner[owner].append(pick)
             else:
                 st.warning("⚠️ Could not load draft picks (Sleeper returned non-200 status).")
+                st.text(f"Draft Picks URL: {picks_url}")
+                st.text(f"Status Code: {picks_response.status_code}")
+                st.text(f"Raw Response: {picks_response.text[:300]}")
         except Exception as e:
             st.warning(f"⚠️ Could not load draft picks: {e}")
 
