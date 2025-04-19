@@ -44,9 +44,22 @@ try:
                 })
 
             # Add draft picks using proper Sleeper API
-        picks_url = f"https://api.sleeper.app/v1/league/{league_id}/draft_picks"
-        picks_response = requests.get(picks_url)
-        picks_data = picks_response.json()
+        picks_by_owner = {}
+
+        try:
+            picks_url = f"https://api.sleeper.app/v1/league/{league_id}/draft_picks"
+            picks_response = requests.get(picks_url)
+            if picks_response.status_code == 200:
+                picks_data = picks_response.json()
+                for pick in picks_data:
+                    owner = pick.get("owner_id")
+                    if owner not in picks_by_owner:
+                        picks_by_owner[owner] = []
+                    picks_by_owner[owner].append(pick)
+            else:
+                st.warning("⚠️ Could not load draft picks (Sleeper returned non-200 status).")
+        except Exception as e:
+            st.warning(f"⚠️ Could not load draft picks: {e}")
 
         picks_by_owner = {}
         for pick in picks_data:
