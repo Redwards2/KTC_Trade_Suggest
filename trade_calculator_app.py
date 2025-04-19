@@ -90,6 +90,9 @@ try:
 
         merged = df.merge(ktc_df, on="Player_Sleeper_lower", how="left", suffixes=("", "_ktc"))
         merged = merged.drop(columns=["Player_Sleeper_lower"])
+        if "KTC_Value_ktc" in merged.columns:
+            merged["KTC_Value"] = merged["KTC_Value_ktc"].fillna(merged["KTC_Value"])
+            merged = merged.drop(columns=["KTC_Value_ktc"])
         merged["KTC_Value"] = merged["KTC_Value"].fillna(0).astype(int)
         # Keep all picks, even those with manually injected values below 2000
         merged = merged[merged["KTC_Value"] > 0]
