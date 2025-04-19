@@ -73,7 +73,8 @@ try:
     # Sidebar: User & League Picker
     # --------------------
     st.sidebar.header("Import Your League")
-    username = st.sidebar.text_input("Enter your Sleeper username")
+    username = st.sidebar.text_input("Enter your Sleeper username").strip()
+    username_lower = username.lower()
 
     league_id = None
     league_options = {}
@@ -129,11 +130,13 @@ try:
     if not df.empty:
         st.title("Dynasty Trade Calculator (KTC Style)")
 
-        user_players = df[df["Team_Owner"] == username]
+        user_players = df[df["Team_Owner"].str.lower() == username_lower]
         player_list = user_players["Player_Sleeper"].sort_values().unique()
         selected_player = st.selectbox("Select a player to trade away:", player_list)
         tolerance = st.slider("Match Tolerance (%)", 1, 15, 5)
-        qb_premium_setting = st.slider("QB Premium Bonus", 0, 500, 300, step=25)
+        st.markdown("**QB Premium**")
+        st.caption("How much does your league value QBs?")
+        qb_premium_setting = st.slider("QB Premium Bonus", 0, 1500, 300, step=25)
 
         if selected_player:
             row = df[df["Player_Sleeper"] == selected_player].iloc[0]
