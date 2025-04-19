@@ -91,7 +91,8 @@ try:
         merged = df.merge(ktc_df, on="Player_Sleeper_lower", how="left", suffixes=("", "_ktc"))
         merged = merged.drop(columns=["Player_Sleeper_lower"])
         merged["KTC_Value"] = merged["KTC_Value"].fillna(0).astype(int)
-        merged = merged[merged["KTC_Value"] >= 2000]
+        # Keep all picks, even those with manually injected values below 2000
+        merged = merged[merged["KTC_Value"] > 0]
         return merged
 
     # --------------------
@@ -153,7 +154,8 @@ try:
 
             # Load KTC values
             ktc_df = pd.read_csv("ktc_values.csv", encoding="utf-8-sig")
-            ktc_df = ktc_df[ktc_df["KTC_Value"] >= 2000]
+            # No filtering here so we don't drop draft picks
+            # ktc_df = ktc_df[ktc_df["KTC_Value"] >= 2000]
 
             # Load league data
             if league_id:
