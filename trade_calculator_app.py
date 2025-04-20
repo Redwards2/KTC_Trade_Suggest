@@ -21,7 +21,38 @@ def load_league_data(league_id, ktc_df):
         user_map = {user['user_id']: user['display_name'] for user in users}
 
         data = []
-        
+
+        for roster in rosters:
+            roster_id = roster["roster_id"]
+            owner_id = roster["owner_id"]
+            owner_name = user_map.get(owner_id, f"User {owner_id}")
+            player_ids = roster.get("players", [])
+
+            for pid in player_ids:
+                player_data = player_pool.get(pid, {})
+                full_name = player_data.get("full_name", pid)
+                position = player_data.get("position", "PICK" if "_" in pid and pid.count("_") == 2 else "")
+                team = player_data.get("team", "")
+
+                if position == "PICK":
+                    parts = pid.split("_")
+                    if len(parts) == 3 and all(part.isdigit() for part in parts):
+                        season, rnd, pick = parts
+                        full_name = f"{season} Pick {rnd}.{int(pick):02d}"
+
+                ktc_row = ktc_df[ktc_df["Player_Sleeper"].str.strip().str.lower() == full_name.lower()]
+                ktc_value = int(ktc_row["KTC_Value"].iloc[0]) if not ktc_row.empty else 0
+
+                data.append({
+                    "Sleeper_Player_ID": pid,
+                    "Player_Sleeper": full_name,
+                    "Position": position,
+                    "Team": team,
+                    "Team_Owner": owner_name,
+                    "Roster_ID": roster_id,
+                    "KTC_Value": ktc_value
+                })
+
 
         df = pd.DataFrame(data)
         ktc_df["Player_Sleeper_lower"] = ktc_df["Player_Sleeper"].str.lower()
