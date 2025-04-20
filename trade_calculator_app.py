@@ -42,26 +42,24 @@ def load_league_data(league_id, ktc_df):
                     "Roster_ID": roster_id
                 })
 
-            # Add draft picks using proper Sleeper API
-        picks_by_owner = {}
-
-        try:
-            picks_url = f"https://api.sleeper.app/v1/league/{league_id}/draft_picks"
-            picks_response = requests.get(picks_url)
-            if picks_response.status_code == 200:
-                picks_data = picks_response.json()
-                for pick in picks_data:
-                    owner = pick.get("owner_id")
-                    if owner not in picks_by_owner:
-                        picks_by_owner[owner] = []
-                    picks_by_owner[owner].append(pick)
-            else:
-                st.warning("⚠️ Could not load draft picks (Sleeper returned non-200 status).")
-                st.text(f"Draft Picks URL: {picks_url}")
-                st.text(f"Status Code: {picks_response.status_code}")
-                st.text(f"Raw Response: {picks_response.text[:300]}")
-        except Exception as e:
-            st.warning(f"⚠️ Could not load draft picks: {e}")
+            # Detect picks directly from player_ids instead of using the draft_picks API
+        for pid in player_ids:
+            if '_' in pid and pid.count('_') == 2:
+                parts = pid.split('_')
+                if parts[0].isdigit() and parts[1].isdigit() and parts[2].isdigit():
+                    season, rnd, pick = parts
+                    pick_label = f"{season} Pick {rnd}.{int(pick):02d}"
+                    ktc_row = ktc_df[ktc_df["Player_Sleeper"].str.strip().str.lower() == pick_label.lower()]
+                    ktc_value = int(ktc_row["KTC_Value"].iloc[0]) if not ktc_row.empty else 0
+                    data.append({
+                        "Sleeper_Player_ID": pid,
+                        "Player_Sleeper": pick_label,
+                        "Position": "PICK",
+                        "Team": "",
+                        "Team_Owner": owner_name,
+                        "Roster_ID": roster_id,
+                        "KTC_Value": ktc_value
+                    })
 
         
 
