@@ -25,9 +25,20 @@ def load_league_data(league_id, ktc_df):
         # Create a mapping of roster_id to owner_name
         roster_owner_map = {roster["roster_id"]: user_map.get(roster["owner_id"], f"User {roster['owner_id']}") for roster in rosters}
 
-        # Default pick ownership (assuming 12 teams and 4 rounds for 2025)
+        # Determine draft order based on reverse final standings
+        try:
+            previous_league_id = requests.get(f"https://api.sleeper.app/v1/league/{league_id}").json().get("previous_league_id")
+            if previous_league_id:
+                standings = requests.get(f"https://api.sleeper.app/v1/league/{previous_league_id}/rosters").json()
+                standings_sorted = sorted(standings, key=lambda x: x.get("settings", {}).get("wins", 0) - x.get("settings", {}).get("losses", 0))
+                ordered_rosters = [r["roster_id"] for r in standings_sorted]
+            else:
+                ordered_rosters = sorted(roster_owner_map.keys())
+        except:
+            ordered_rosters = sorted(roster_owner_map.keys())
+
         for rnd in range(1, 5):
-            for i, roster_id in enumerate(sorted(roster_owner_map.keys())):
+            for i, roster_id in enumerate(ordered_rosters):
                 pick_number = f"{rnd}.{i+1:02d}"
                 pick_label = f"2025 Pick {pick_number}"
                 pid = f"2025_{rnd}_{i+1}"
