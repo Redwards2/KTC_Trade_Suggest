@@ -56,7 +56,9 @@ def load_league_data(league_id, ktc_df):
 
         # Override with traded pick data
         try:
-            traded = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/draft_picks").json()
+            traded_response = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/draft_picks")
+            traded_response.raise_for_status()
+            traded = traded_response.json()
             pick_index_map = {(f"2025 Pick {r}.{p:02d}"): idx for r in range(1, 5) for p, idx in zip(range(1, 13), range(12))}
             for pick in traded:
                 season = pick.get("season")
