@@ -145,7 +145,6 @@ try:
     if not df.empty:
         st.title("Trade Suggestions (Based off KTC Values)")
         st.caption("Adding draft picks soon")
-        st.caption("Adding draft picks soon")
 
         user_players = df[df["Team_Owner"].str.lower() == username_lower]
         player_list = user_players["Player_Sleeper"].sort_values().unique()
