@@ -214,7 +214,8 @@ try:
                         })
 
             if results:
-                st.dataframe(pd.DataFrame(results))
+                trade_df = pd.DataFrame(results)
+                st.dataframe(trade_df.sort_values(by=["Owner", "Player 1", "Player 2"]))
             else:
                 st.markdown("No good 2-for-1 trade suggestions found.")
     else:
