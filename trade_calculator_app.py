@@ -200,6 +200,8 @@ try:
                 for (i1, p1), (i2, p2) in combos:
                     if p1["Player_Sleeper"] in one_for_one_players or p2["Player_Sleeper"] in one_for_one_players:
                         continue
+                    if p1["KTC_Value"] > base_value or p2["KTC_Value"] > base_value:
+                        continue
                     total = p1["KTC_Value"] + p2["KTC_Value"]
                     if p1["Position"] == "QB": total += qb_premium_setting
                     if p2["Position"] == "QB": total += qb_premium_setting
