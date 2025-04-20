@@ -57,29 +57,31 @@ def load_league_data(league_id, ktc_df):
         # Override with traded pick data
         try:
             traded = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/draft_picks").json()
+            pick_index_map = {(f"2025 Pick {r}.{p:02d}"): idx for r in range(1, 5) for p, idx in zip(range(1, 13), range(12))}
             for pick in traded:
                 season = pick.get("season")
                 round_num = pick.get("round")
                 order = pick.get("order")
                 owner_id = pick.get("owner_id")
-                roster_id = pick.get("roster_id")
-                if season != "2025" or not order:
+                if season != "2025" or not round_num or not order:
                     continue
-                pick_number = f"{round_num}.{int(order):02d}"
-                pick_label = f"2025 Pick {pick_number}"
+                pick_label = f"2025 Pick {round_num}.{int(order):02d}"
                 pid = f"2025_{round_num}_{order}"
                 ktc_row = ktc_df[ktc_df["Player_Sleeper"].str.strip().str.lower() == pick_label.lower()]
                 ktc_value = int(ktc_row["KTC_Value"].iloc[0]) if not ktc_row.empty else 0
+                owner_name = user_map.get(owner_id, f"User {owner_id}")
+                data = [d for d in data if d["Sleeper_Player_ID"] != pid]
                 data.append({
                     "Sleeper_Player_ID": pid,
                     "Player_Sleeper": pick_label,
                     "Position": "PICK",
                     "Team": "",
-                    "Team_Owner": user_map.get(owner_id, f"User {owner_id}"),
-                    "Roster_ID": roster_id,
+                    "Team_Owner": owner_name,
+                    "Roster_ID": None,
                     "KTC_Value": ktc_value
                 })
-        except:
+        except Exception as e:
+            st.warning(f"⚠️ Could not process traded picks: {e}")
             pass
 
         for roster in rosters:
