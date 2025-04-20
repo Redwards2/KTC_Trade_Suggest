@@ -22,6 +22,55 @@ def load_league_data(league_id, ktc_df):
 
         data = []
 
+        # Create a mapping of roster_id to owner_name
+        roster_owner_map = {roster["roster_id"]: user_map.get(roster["owner_id"], f"User {roster['owner_id']}") for roster in rosters}
+
+        # Default pick ownership (assuming 12 teams and 4 rounds for 2025)
+        for rnd in range(1, 5):
+            for i, roster_id in enumerate(sorted(roster_owner_map.keys())):
+                pick_number = f"{rnd}.{i+1:02d}"
+                pick_label = f"2025 Pick {pick_number}"
+                pid = f"2025_{rnd}_{i+1}"
+                ktc_row = ktc_df[ktc_df["Player_Sleeper"].str.strip().str.lower() == pick_label.lower()]
+                ktc_value = int(ktc_row["KTC_Value"].iloc[0]) if not ktc_row.empty else 0
+                data.append({
+                    "Sleeper_Player_ID": pid,
+                    "Player_Sleeper": pick_label,
+                    "Position": "PICK",
+                    "Team": "",
+                    "Team_Owner": roster_owner_map[roster_id],
+                    "Roster_ID": roster_id,
+                    "KTC_Value": ktc_value
+                })
+
+        # Override with traded pick data
+        try:
+            traded = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/draft_picks").json()
+            for pick in traded:
+                season = pick.get("season")
+                round_num = pick.get("round")
+                order = pick.get("order")
+                owner_id = pick.get("owner_id")
+                roster_id = pick.get("roster_id")
+                if season != "2025" or not order:
+                    continue
+                pick_number = f"{round_num}.{int(order):02d}"
+                pick_label = f"2025 Pick {pick_number}"
+                pid = f"2025_{round_num}_{order}"
+                ktc_row = ktc_df[ktc_df["Player_Sleeper"].str.strip().str.lower() == pick_label.lower()]
+                ktc_value = int(ktc_row["KTC_Value"].iloc[0]) if not ktc_row.empty else 0
+                data.append({
+                    "Sleeper_Player_ID": pid,
+                    "Player_Sleeper": pick_label,
+                    "Position": "PICK",
+                    "Team": "",
+                    "Team_Owner": user_map.get(owner_id, f"User {owner_id}"),
+                    "Roster_ID": roster_id,
+                    "KTC_Value": ktc_value
+                })
+        except:
+            pass
+
         for roster in rosters:
             roster_id = roster["roster_id"]
             owner_id = roster["owner_id"]
@@ -126,7 +175,7 @@ if username:
 
             # Load KTC values
             ktc_df = pd.read_csv("ktc_values.csv", encoding="utf-8-sig")
-            st.write("✅ Loaded KTC values:", ktc_df.shape)
+            
 
             # Load league data
             if league_id:
