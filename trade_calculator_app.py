@@ -53,7 +53,6 @@ def load_league_data(league_id, ktc_df):
                     "KTC_Value": ktc_value
                 })
 
-
         df = pd.DataFrame(data)
         ktc_df["Player_Sleeper_lower"] = ktc_df["Player_Sleeper"].str.lower()
         df["Player_Sleeper_lower"] = df["Player_Sleeper"].str.lower()
@@ -64,13 +63,11 @@ def load_league_data(league_id, ktc_df):
             merged["KTC_Value"] = merged["KTC_Value_ktc"].fillna(merged["KTC_Value"])
             merged = merged.drop(columns=["KTC_Value_ktc"])
         merged["KTC_Value"] = merged["KTC_Value"].fillna(0).astype(int)
-        # Keep all picks, even those with manually injected values below 2000
-        merged = merged[merged["KTC_Value"] > 0]
         return merged
 
-    # --------------------
-    # Stud Bonus Function
-    # --------------------
+# --------------------
+# Stud Bonus Function
+# --------------------
 
 def stud_bonus(value):
         if value >= 9000: return 3450
@@ -86,9 +83,9 @@ def stud_bonus(value):
         elif value >= 2000: return 650
         return 0
 
-    # --------------------
-    # Sidebar: User & League Picker
-    # --------------------
+# --------------------
+# Sidebar: User & League Picker
+# --------------------
 
 st.sidebar.header("Import Your League")
 username = st.sidebar.text_input("Enter your Sleeper username").strip()
@@ -130,8 +127,6 @@ if username:
             # Load KTC values
             ktc_df = pd.read_csv("ktc_values.csv", encoding="utf-8-sig")
             st.write("✅ Loaded KTC values:", ktc_df.shape)
-            # No filtering here so we don't drop draft picks
-            # ktc_df = ktc_df[ktc_df["KTC_Value"] >= 2000]
 
             # Load league data
             if league_id:
