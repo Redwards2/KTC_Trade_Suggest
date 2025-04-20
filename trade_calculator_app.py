@@ -215,6 +215,15 @@ try:
 
             if results:
                 trade_df = pd.DataFrame(results)
+                selected_owner_filter = st.selectbox("Filter by Owner:", options=["All"] + sorted(trade_df["Owner"].unique()))
+                selected_p1_filter = st.selectbox("Filter by Player 1:", options=["All"] + sorted(trade_df["Player 1"].unique()))
+                selected_p2_filter = st.selectbox("Filter by Player 2:", options=["All"] + sorted(trade_df["Player 2"].unique()))
+                if selected_owner_filter != "All":
+                    trade_df = trade_df[trade_df["Owner"] == selected_owner_filter]
+                if selected_p1_filter != "All":
+                    trade_df = trade_df[trade_df["Player 1"] == selected_p1_filter]
+                if selected_p2_filter != "All":
+                    trade_df = trade_df[trade_df["Player 2"] == selected_p2_filter]
                 st.dataframe(trade_df.sort_values(by=["Owner", "Player 1", "Player 2"]))
             else:
                 st.markdown("No good 2-for-1 trade suggestions found.")
