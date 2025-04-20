@@ -191,12 +191,15 @@ try:
             two_high = int(adjusted_value * (1 + tolerance / 100))
 
             results = []
+            one_for_one_players = set(one_for_one["Player_Sleeper"])
             for team_owner in df["Team_Owner"].unique():
                 if team_owner == owner:
                     continue
                 team_players = df[df["Team_Owner"] == team_owner]
                 combos = combinations(team_players.iterrows(), 2)
                 for (i1, p1), (i2, p2) in combos:
+                    if p1["Player_Sleeper"] in one_for_one_players or p2["Player_Sleeper"] in one_for_one_players:
+                        continue
                     total = p1["KTC_Value"] + p2["KTC_Value"]
                     if p1["Position"] == "QB": total += qb_premium_setting
                     if p2["Position"] == "QB": total += qb_premium_setting
