@@ -159,7 +159,15 @@ if username:
                     one_names = set(one_for_one["Player_Sleeper"])
 
                     if not one_for_one.empty:
-                        one_for_one["Logo"] = one_for_one["Team"].apply(lambda x: f"<img src='https://a.espncdn.com/i/teamlogos/nfl/500/{x.lower()}.png' width='32'/>" if x else "")
+                        team_logo_map = {
+                            'ARI': 'ari', 'ATL': 'atl', 'BAL': 'bal', 'BUF': 'buf', 'CAR': 'car', 'CHI': 'chi', 'CIN': 'cin', 'CLE': 'cle',
+                            'DAL': 'dal', 'DEN': 'den', 'DET': 'det', 'GB': 'gb', 'HOU': 'hou', 'IND': 'ind', 'JAX': 'jac', 'KC': 'kc',
+                            'LV': 'lv', 'LAC': 'lac', 'LAR': 'lar', 'MIA': 'mia', 'MIN': 'min', 'NE': 'ne', 'NO': 'nor', 'NYG': 'nyg',
+                            'NYJ': 'nyj', 'PHI': 'phi', 'PIT': 'pit', 'SEA': 'sea', 'SF': 'sf', 'TB': 'tb', 'TEN': 'ten', 'WAS': 'wsh'
+                        }
+                        one_for_one["Logo"] = one_for_one["Team"].apply(
+                            lambda x: f"<img src='https://a.espncdn.com/i/teamlogos/nfl/500/{team_logo_map.get(x, '').lower()}.png' width='32'/>" if x in team_logo_map else ""
+                        )
                         one_for_one["Team_Logo"] = one_for_one["Logo"] + " " + one_for_one["Team"]
                         st.write(one_for_one[["Player_Sleeper", "Position", "Team_Logo", "KTC_Value", "Team_Owner"]].to_html(escape=False, index=False), unsafe_allow_html=True)
                     else:
