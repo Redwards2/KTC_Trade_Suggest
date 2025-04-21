@@ -68,38 +68,6 @@ def stud_bonus(value):
 # --------------------
 st.set_page_config(page_title="KTC Trade Suggest", layout="wide")
 
-# Sticky container styling
-st.markdown("""
-<style>
-.sticky-container {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    background-color: #0e1117;
-    z-index: 999;
-    padding-top: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #444;
-    margin-bottom: 1rem;
-}
-.card {
-    background-color: #1c1c1e;
-    border-radius: 12px;
-    padding: 1rem;
-    margin: 0.5rem 0;
-    border: 1px solid #333;
-}
-.card h4 {
-    margin: 0;
-    color: #FFD700;
-}
-.card p {
-    margin: 0.3rem 0;
-    color: #bbb;
-}
-</style>
-""", unsafe_allow_html=True)
-
 username = st.sidebar.text_input("Enter your Sleeper username").strip()
 username_lower = username.lower()
 
@@ -127,17 +95,13 @@ if username:
         df, player_pool = load_league_data(league_id, ktc_df)
 
         if not df.empty:
-            # Calculate top 30 QBs by KTC value
             top_qbs = df[df["Position"] == "QB"].sort_values("KTC_Value", ascending=False).head(30)["Player_Sleeper"].tolist()
 
             user_players = df[df["Team_Owner"].str.lower() == username_lower]
             player_list = user_players["Player_Sleeper"].sort_values().unique()
 
-            st.markdown("""
-            <div class="sticky-container">
-                <h1 style='text-align:center; color:#4FC3F7;'>Trade Suggestions (Based off KTC Values)</h1>
-                <h4 style='text-align:center; color:#BBBBBB;'>Adding draft picks soon</h4>
-            """, unsafe_allow_html=True)
+            st.title("Trade Suggestions (Based off KTC Values)")
+            st.caption("Adding draft picks soon")
 
             if len(player_list) > 0:
                 selected_player = st.selectbox("Select a player to trade away:", player_list)
@@ -154,9 +118,7 @@ if username:
                         unsafe_allow_html=True
                     )
 
-            st.markdown("</div>", unsafe_allow_html=True)
-
-            tolerance = st.slider("Match Tolerance (%)", 1, 15, 5, help="How closely values must match to be considered a fair trade")
+            tolerance = st.slider("Match Tolerance (%)", 1, 15, 5)
             st.markdown("**QB Premium**")
             st.caption("How much does your league value QBs?")
             qb_premium_setting = st.slider("QB Premium Bonus", 0, 1500, 300, step=25)
@@ -219,15 +181,7 @@ if username:
                                 })
 
                     if results:
-                        st.markdown("---")
-                        for trade in results:
-                            st.markdown(f"""
-                                <div class="card">
-                                    <h4>{trade['Owner']}</h4>
-                                    <p><b>{trade['Player 1']}</b> + <b>{trade['Player 2']}</b></p>
-                                    <p>Total KTC: {trade['Total KTC']}</p>
-                                </div>
-                            """, unsafe_allow_html=True)
+                        st.dataframe(pd.DataFrame(results))
                     else:
                         st.markdown("No good 2-for-1 trade suggestions found.")
 
