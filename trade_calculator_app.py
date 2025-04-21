@@ -70,6 +70,7 @@ def dud_bonus(value):
     if value <= 1000: return -800
     elif value <= 1500: return -600
     elif value <= 2000: return -400
+    elif value <= 2500: return -250
     return 0
 
 # --------------------
