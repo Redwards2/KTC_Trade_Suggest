@@ -142,7 +142,7 @@ if username:
                 adjusted_value = base_value + bonus + qb_premium
 
                 st.markdown("<h3 style='text-align:center;'>Selected Player Details</h3>", unsafe_allow_html=True)
-                st.markdown(f"<ul style='text-align:center; list-style-position: inside;'><li><strong>Player:</strong> {selected_player}</li>", unsafe_allow_html=True)
+                st.markdown(f"<ul style='text-align:center; list-style-position: inside;'><strong>Player:</strong> {selected_player}</li>", unsafe_allow_html=True)
                 st.markdown(f"<ul style='text-align:center; list-style-position: inside;'><li><strong>Team Owner:</strong> {owner}</li>", unsafe_allow_html=True)
                 st.markdown(f"<ul style='text-align:center; list-style-position: inside;'><li><strong>Raw KTC Value:</strong> {base_value}</li>", unsafe_allow_html=True)
                 st.markdown(f"<ul style='text-align:center; list-style-position: inside;'><li><strong>Stud Bonus (2-for-1 only):</strong> +{bonus}</li>", unsafe_allow_html=True)
