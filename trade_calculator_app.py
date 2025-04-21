@@ -107,7 +107,7 @@ if username:
         leagues = response.json()
 
         league_options = {league['name']: league['league_id'] for league in leagues}
-        selected_league_name = st.sidebar.selectbox("Select a league", list(league_options.keys()))
+        selected_league_name = st.sidebar.selectbox("Select a league", list(league_options.keys()), key="league_select")
         league_id = league_options[selected_league_name]
 
     except Exception as e:
