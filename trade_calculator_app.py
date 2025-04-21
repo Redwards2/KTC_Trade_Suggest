@@ -127,6 +127,9 @@ if username:
         df, player_pool = load_league_data(league_id, ktc_df)
 
         if not df.empty:
+            # Calculate top 30 QBs by KTC value
+            top_qbs = df[df["Position"] == "QB"].sort_values("KTC_Value", ascending=False).head(30)["Player_Sleeper"].tolist()
+
             user_players = df[df["Team_Owner"].str.lower() == username_lower]
             player_list = user_players["Player_Sleeper"].sort_values().unique()
 
@@ -163,7 +166,7 @@ if username:
                 owner = row["Team_Owner"]
                 base_value = row["KTC_Value"]
                 bonus = stud_bonus(base_value)
-                qb_premium = qb_premium_setting if row["Position"] == "QB" else 0
+                qb_premium = qb_premium_setting if row["Position"] == "QB" and selected_player in top_qbs else 0
                 adjusted_value = base_value + bonus + qb_premium
 
                 col1, col2, col3 = st.columns(3)
@@ -205,8 +208,8 @@ if username:
                             if p1["KTC_Value"] > base_value or p2["KTC_Value"] > base_value:
                                 continue
                             total = p1["KTC_Value"] + p2["KTC_Value"]
-                            if p1["Position"] == "QB": total += qb_premium_setting
-                            if p2["Position"] == "QB": total += qb_premium_setting
+                            if p1["Position"] == "QB" and p1["Player_Sleeper"] in top_qbs: total += qb_premium_setting
+                            if p2["Position"] == "QB" and p2["Player_Sleeper"] in top_qbs: total += qb_premium_setting
                             if two_low <= total <= two_high:
                                 results.append({
                                     "Owner": team_owner,
