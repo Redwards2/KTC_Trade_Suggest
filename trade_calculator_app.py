@@ -44,7 +44,7 @@ def load_league_data(league_id, ktc_df):
                 "KTC_Value": ktc_value
             })
 
-    return pd.DataFrame(data)
+    return pd.DataFrame(data), player_pool
 
 # --------------------
 # Stud Bonus Function
@@ -96,7 +96,7 @@ if username:
         league_id = league_options[selected_league_name]
 
         ktc_df = pd.read_csv("ktc_values.csv", encoding="utf-8-sig")
-        df = load_league_data(league_id, ktc_df)
+        df, player_pool = load_league_data(league_id, ktc_df)
 
         if not df.empty:
             user_players = df[df["Team_Owner"].str.lower() == username_lower]
@@ -115,6 +115,11 @@ if username:
                 bonus = stud_bonus(base_value)
                 qb_premium = qb_premium_setting if row["Position"] == "QB" else 0
                 adjusted_value = base_value + bonus + qb_premium
+
+                # 🔥 Display Player Headshot
+                selected_id = row["Sleeper_Player_ID"]
+                headshot_url = f"https://sleepercdn.com/content/nfl/players/{selected_id}.jpg"
+                st.image(headshot_url, width=120, caption=selected_player)
 
                 col1, col2, col3 = st.columns(3)
                 col1.metric("Raw KTC", base_value)
