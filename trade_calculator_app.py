@@ -142,12 +142,12 @@ if username:
                 adjusted_value = base_value + bonus + qb_premium
 
                 st.markdown("<h3 style='text-align:center;'>Selected Player Details</h3>", unsafe_allow_html=True)
-                st.markdown(f"- **Player:** {selected_player}")
-                st.markdown(f"- **Team Owner:** {owner}")
-                st.markdown(f"- **Raw KTC Value:** {base_value}")
-                st.markdown(f"- **Stud Bonus (2-for-1 only):** +{bonus}")
-                st.markdown(f"- **QB Premium:** +{qb_premium if qb_premium else 0}")
-                st.markdown(f"- **Adjusted 2-for-1 Value:** {adjusted_value}")
+                st.markdown(f"<ul style='text-align:center; list-style-position: inside;'><li><strong>Player:</strong> {selected_player}</li>", unsafe_allow_html=True)
+                st.markdown(f"<li><strong>Team Owner:</strong> {owner}</li>", unsafe_allow_html=True)
+                st.markdown(f"<li><strong>Raw KTC Value:</strong> {base_value}</li>", unsafe_allow_html=True)
+                st.markdown(f"<li><strong>Stud Bonus (2-for-1 only):</strong> +{bonus}</li>", unsafe_allow_html=True)
+                st.markdown(f"<li><strong>QB Premium:</strong> +{qb_premium if qb_premium else 0}</li>", unsafe_allow_html=True)
+                st.markdown(f"<li><strong>Adjusted 2-for-1 Value:</strong> {adjusted_value}</li></ul>", unsafe_allow_html=True)
 
                 st.markdown("<h3 style='text-align:center;'>1-for-1 Trade Suggestions</h3>", unsafe_allow_html=True)
                 one_low = int(base_value * (1 - tolerance / 100))
