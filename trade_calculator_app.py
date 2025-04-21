@@ -169,8 +169,11 @@ if username:
                 st.subheader("2-for-1 Trade Suggestions")
                 all_names = sorted(set(df['Player_Sleeper']))
                 col1, col2 = st.columns([3, 1])
-with col1:
-    player_filter_name = st.selectbox("Filter 2-for-1 Trades by Player Name (Player 1 OR 2)", options=[""] + all_names, key="player_filter").strip().lower()
+                with col1:
+                    player_filter_name = st.selectbox("Filter 2-for-1 Trades by Player Name (Player 1 OR 2)", options=[""] + all_names, key="player_filter").strip().lower()
+                with col2:
+                    if st.button("Clear Filter"):
+                        player_filter_name = ""
 with col2:
     if st.button("Clear Filter"):
         player_filter_name = ""
