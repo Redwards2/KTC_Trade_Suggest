@@ -168,7 +168,7 @@ if username:
                     st.markdown("No good 1-for-1 trade suggestions found.")
 
                 st.subheader("2-for-1 Trade Suggestions")
-player_filter_name = st.text_input("Filter 2-for-1 Trades by Player Name (Player 1 OR 2)").strip().lower()
+player_filter_name = st.text_input("Filter 2-for-1 Trades by Player Name (Player 1 OR 2)", key="player_filter").strip().lower()
                 two_low = int(adjusted_value * (1 - tolerance / 100))
                 two_high = int(adjusted_value * (1 + tolerance / 100))
 
