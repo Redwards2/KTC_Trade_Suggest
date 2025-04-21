@@ -154,7 +154,7 @@ if league_id and not df.empty:
         st.markdown(f"<ul style='text-align:center; list-style-position: inside;'><strong>QB Premium:</strong> +{qb_premium}</li>", unsafe_allow_html=True)
         st.markdown(f"<ul style='text-align:center; list-style-position: inside;'><strong>Adjusted 2-for-1 Value:</strong> {adjusted_value}</li></ul>", unsafe_allow_html=True)
 
-        st.markdown("<h3 style='text-align:center;'>1-for-1 Trade Suggestions</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align:center;color:#4da6ff;'>1-for-1 Trade Suggestions</h3>", unsafe_allow_html=True)
         one_low = int(base_value * (1 - tolerance / 100))
         one_high = int(base_value * (1 + tolerance / 100))
 
@@ -173,7 +173,7 @@ if league_id and not df.empty:
         else:
             st.markdown("No good 1-for-1 trade suggestions found.")
 
-        st.markdown("<h3 style='text-align:center;'>2-for-1 Trade Suggestions</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align:center;color:#4da6ff;'>2-for-1 Trade Suggestions</h3>", unsafe_allow_html=True)
         two_low = int(adjusted_value * (1 - tolerance / 100))
         two_high = int(adjusted_value * (1 + tolerance / 100))
 
