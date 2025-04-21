@@ -175,8 +175,8 @@ if username:
                             if two_low <= total <= two_high:
                                 results.append({
                                     "Owner": team_owner,
-                                    "Player 1": p1["Player_Sleeper"],
-                                    "Player 2": p2["Player_Sleeper"],
+                                    "Player 1": f"{p1['Player_Sleeper']} (KTC: {p1['KTC_Value']})",
+                                    "Player 2": f"{p2['Player_Sleeper']} (KTC: {p2['KTC_Value']})",
                                     "Total KTC": total
                                 })
 
