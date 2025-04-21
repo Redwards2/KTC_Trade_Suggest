@@ -67,8 +67,14 @@ def stud_bonus(value):
 # Streamlit UI
 # --------------------
 st.set_page_config(page_title="KTC Trade Suggest", layout="wide")
-st.title("Trade Suggestions (Based off KTC Values)")
-st.caption("Adding draft picks soon")
+
+st.markdown(
+    """
+    <h1 style='text-align:center; color:#4FC3F7;'>Trade Suggestions (Based off KTC Values)</h1>
+    <h4 style='text-align:center; color:#BBBBBB;'>Adding draft picks soon</h4>
+    """,
+    unsafe_allow_html=True
+)
 
 username = st.sidebar.text_input("Enter your Sleeper username").strip()
 username_lower = username.lower()
@@ -93,12 +99,11 @@ if username:
         df = load_league_data(league_id, ktc_df)
 
         if not df.empty:
-            st.success("✅ League and player data loaded!")
-
             user_players = df[df["Team_Owner"].str.lower() == username_lower]
             player_list = user_players["Player_Sleeper"].sort_values().unique()
             selected_player = st.selectbox("Select a player to trade away:", player_list)
-            tolerance = st.slider("Match Tolerance (%)", 1, 15, 5)
+            tolerance = st.slider("Match Tolerance (%)", 1, 15, 5, help="How closely values must match to be considered a fair trade")
+
             st.markdown("**QB Premium**")
             st.caption("How much does your league value QBs?")
             qb_premium_setting = st.slider("QB Premium Bonus", 0, 1500, 300, step=25)
@@ -111,67 +116,64 @@ if username:
                 qb_premium = qb_premium_setting if row["Position"] == "QB" else 0
                 adjusted_value = base_value + bonus + qb_premium
 
-                st.subheader("Selected Player Details")
-                st.markdown(f"- **Player:** {selected_player}")
-                st.markdown(f"- **Team Owner:** {owner}")
-                st.markdown(f"- **Raw KTC Value:** {base_value}")
-                st.markdown(f"- **Stud Bonus (2-for-1 only):** +{bonus}")
-                st.markdown(f"- **QB Premium:** +{qb_premium if qb_premium else 0}")
-                st.markdown(f"- **Adjusted 2-for-1 Value:** {adjusted_value}")
+                col1, col2, col3 = st.columns(3)
+                col1.metric("Raw KTC", base_value)
+                col2.metric("Stud Bonus", f"+{bonus}")
+                col3.metric("Adj. 2-for-1 Value", adjusted_value)
 
                 # 1-for-1 Trades
-                st.subheader("1-for-1 Trade Suggestions")
-                one_low = int(base_value * (1 - tolerance / 100))
-                one_high = int(base_value * (1 + tolerance / 100))
+                with st.expander("📦 1-for-1 Trade Suggestions"):
+                    one_low = int(base_value * (1 - tolerance / 100))
+                    one_high = int(base_value * (1 + tolerance / 100))
 
-                one_for_one = df[
-                    (df["KTC_Value"] >= one_low) &
-                    (df["KTC_Value"] <= one_high) &
-                    (df["Team_Owner"] != owner)
-                ]
+                    one_for_one = df[
+                        (df["KTC_Value"] >= one_low) &
+                        (df["KTC_Value"] <= one_high) &
+                        (df["Team_Owner"] != owner)
+                    ]
 
-                one_names = set(one_for_one["Player_Sleeper"])
-                st.dataframe(one_for_one[["Player_Sleeper", "Position", "Team", "KTC_Value", "Team_Owner"]])
+                    one_names = set(one_for_one["Player_Sleeper"])
+                    st.dataframe(one_for_one[["Player_Sleeper", "Position", "Team", "KTC_Value", "Team_Owner"]])
 
                 # 2-for-1 Trades
-                st.subheader("2-for-1 Trade Suggestions")
-                two_low = int(adjusted_value * (1 - tolerance / 100))
-                two_high = int(adjusted_value * (1 + tolerance / 100))
+                with st.expander("📦 2-for-1 Trade Suggestions"):
+                    two_low = int(adjusted_value * (1 - tolerance / 100))
+                    two_high = int(adjusted_value * (1 + tolerance / 100))
 
-                owner_filter = st.selectbox("Filter by Owner", ["All"] + sorted(df["Team_Owner"].unique()))
-                results = []
+                    owner_filter = st.selectbox("Filter by Owner", ["All"] + sorted(df["Team_Owner"].unique()))
+                    results = []
 
-                for team_owner in df["Team_Owner"].unique():
-                    if team_owner == owner:
-                        continue
-                    if owner_filter != "All" and team_owner != owner_filter:
-                        continue
-
-                    team_players = df[df["Team_Owner"] == team_owner]
-                    combos = combinations(team_players.iterrows(), 2)
-                    for (i1, p1), (i2, p2) in combos:
-                        if p1["Player_Sleeper"] in one_names or p2["Player_Sleeper"] in one_names:
+                    for team_owner in df["Team_Owner"].unique():
+                        if team_owner == owner:
                             continue
-                        if p1["KTC_Value"] > base_value or p2["KTC_Value"] > base_value:
+                        if owner_filter != "All" and team_owner != owner_filter:
                             continue
-                        total = p1["KTC_Value"] + p2["KTC_Value"]
-                        if p1["Position"] == "QB": total += qb_premium_setting
-                        if p2["Position"] == "QB": total += qb_premium_setting
-                        if two_low <= total <= two_high:
-                            results.append({
-                                "Owner": team_owner,
-                                "Player 1": p1["Player_Sleeper"],
-                                "Player 2": p2["Player_Sleeper"],
-                                "Total KTC": total
-                            })
 
-                if results:
-                    df_res = pd.DataFrame(results)
-                    df_res = df_res.sort_values(by="Total KTC", ascending=False)
-                    df_res = df_res[df_res["Total KTC"] > 0]
-                    st.dataframe(df_res)
-                else:
-                    st.markdown("No good 2-for-1 trade suggestions found.")
+                        team_players = df[df["Team_Owner"] == team_owner]
+                        combos = combinations(team_players.iterrows(), 2)
+                        for (i1, p1), (i2, p2) in combos:
+                            if p1["Player_Sleeper"] in one_names or p2["Player_Sleeper"] in one_names:
+                                continue
+                            if p1["KTC_Value"] > base_value or p2["KTC_Value"] > base_value:
+                                continue
+                            total = p1["KTC_Value"] + p2["KTC_Value"]
+                            if p1["Position"] == "QB": total += qb_premium_setting
+                            if p2["Position"] == "QB": total += qb_premium_setting
+                            if two_low <= total <= two_high:
+                                results.append({
+                                    "Owner": team_owner,
+                                    "Player 1": p1["Player_Sleeper"],
+                                    "Player 2": p2["Player_Sleeper"],
+                                    "Total KTC": total
+                                })
+
+                    if results:
+                        df_res = pd.DataFrame(results)
+                        df_res = df_res.sort_values(by="Total KTC", ascending=False)
+                        df_res = df_res[df_res["Total KTC"] > 0]
+                        st.dataframe(df_res)
+                    else:
+                        st.markdown("No good 2-for-1 trade suggestions found.")
 
         else:
             st.warning("No players found in league.")
