@@ -101,9 +101,28 @@ if username:
         if not df.empty:
             user_players = df[df["Team_Owner"].str.lower() == username_lower]
             player_list = user_players["Player_Sleeper"].sort_values().unique()
-            selected_player = st.selectbox("Select a player to trade away:", player_list, label_visibility="visible")
-            tolerance = st.slider("Match Tolerance (%)", 1, 15, 5, help="How closely values must match to be considered a fair trade")
 
+            selected_player = None
+            selected_id = None
+
+            # Pre-select player to load image before displaying dropdown
+            if len(player_list) > 0:
+                selected_player = st.selectbox("Select a player to trade away:", player_list, label_visibility="visible")
+                selected_id = df[df["Player_Sleeper"] == selected_player].iloc[0]["Sleeper_Player_ID"]
+
+            # Display player image
+            if selected_id:
+                headshot_url = f"https://sleepercdn.com/content/nfl/players/{selected_id}.jpg"
+                st.markdown(
+                    f"""
+                    <div style='display: flex; justify-content: center;'>
+                        <img src="{headshot_url}" width="120" style="border-radius: 10px; margin-bottom: 12px;"/>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+            tolerance = st.slider("Match Tolerance (%)", 1, 15, 5, help="How closely values must match to be considered a fair trade")
             st.markdown("**QB Premium**")
             st.caption("How much does your league value QBs?")
             qb_premium_setting = st.slider("QB Premium Bonus", 0, 1500, 300, step=25)
@@ -116,24 +135,11 @@ if username:
                 qb_premium = qb_premium_setting if row["Position"] == "QB" else 0
                 adjusted_value = base_value + bonus + qb_premium
 
-                # 🔥 Display Player Headshot (centered)
-                selected_id = row["Sleeper_Player_ID"]
-                headshot_url = f"https://sleepercdn.com/content/nfl/players/{selected_id}.jpg"
-                st.markdown(
-                    f"""
-                    <div style='display: flex; justify-content: center;'>
-                        <img src="{headshot_url}" width="120" style="border-radius: 10px;"/>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
                 col1, col2, col3 = st.columns(3)
                 col1.metric("Raw KTC", base_value)
                 col2.metric("Stud Bonus", f"+{bonus}")
                 col3.metric("Adj. 2-for-1 Value", adjusted_value)
 
-                # 1-for-1 Trades
                 with st.expander("📦 1-for-1 Trade Suggestions"):
                     one_low = int(base_value * (1 - tolerance / 100))
                     one_high = int(base_value * (1 + tolerance / 100))
@@ -147,7 +153,6 @@ if username:
                     one_names = set(one_for_one["Player_Sleeper"])
                     st.dataframe(one_for_one[["Player_Sleeper", "Position", "Team", "KTC_Value", "Team_Owner"]])
 
-                # 2-for-1 Trades
                 with st.expander("📦 2-for-1 Trade Suggestions"):
                     two_low = int(adjusted_value * (1 - tolerance / 100))
                     two_high = int(adjusted_value * (1 + tolerance / 100))
