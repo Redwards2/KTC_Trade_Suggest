@@ -86,26 +86,89 @@ thead tr th, tbody tr td {
 </style>
 """, unsafe_allow_html=True)
 
-# ... [rest of the existing unchanged setup code remains above here] ...
+# --------------------
+# Main App
+# --------------------
+ktc_df = pd.read_csv("ktc_values.csv")
+st.title("Dynasty Trade Calculator (KTC Style)")
+st.caption("Adding draft picks soon")
 
-with st.expander("1-for-1 Trade Suggestions", expanded=True):
-    if not one_for_one.empty:
-        one_for_one['Team'] = one_for_one['Team'].fillna('').apply(
-            lambda abbr: f"<img src='https://a.espncdn.com/i/teamlogos/nfl/500/{abbr}.png' width='30'/> {abbr}" if abbr else abbr)
-        centered_html = f"""
-        <div style='display: flex; justify-content: center;'>
-          <div style='text-align: center;'>
-            {one_for_one[['Player_Sleeper', 'Position', 'Team', 'KTC_Value', 'Team_Owner']].to_html(escape=False, index=False)}
-          </div>
-        </div>
-        """
-        st.markdown(centered_html, unsafe_allow_html=True)
-    else:
-        st.markdown("No good 1-for-1 trade suggestions found.")
+username = st.sidebar.text_input("Enter Sleeper Username:")
+league_id = st.sidebar.text_input("Enter League ID:")
 
-with st.expander("2-for-1 Trade Suggestions", expanded=True):
-    if results:
-        suggestions_df = pd.DataFrame(results)
-        st.dataframe(suggestions_df)
-    else:
-        st.markdown("No good 2-for-1 trade suggestions found.")
+if username and league_id:
+    try:
+        df, _ = load_league_data(league_id, ktc_df)
+        player_list = sorted(df["Player_Sleeper"].unique())
+        selected_player = st.selectbox("Select a player to trade away:", player_list)
+
+        if selected_player:
+            row = df[df["Player_Sleeper"] == selected_player].iloc[0]
+            base_value = row["KTC_Value"]
+            bonus = stud_bonus(base_value)
+            penalty = dud_bonus(base_value)
+            adjusted_value = base_value + bonus + penalty
+
+            st.subheader("Selected Player Details")
+            st.markdown(f"- **Player:** {selected_player}")
+            st.markdown(f"- **Raw KTC Value:** {base_value}")
+            st.markdown(f"- **Stud Bonus:** +{bonus}")
+            st.markdown(f"- **Dud Penalty:** {penalty}")
+            st.markdown(f"- **Adjusted 2-for-1 Value:** {adjusted_value}")
+
+            tolerance = st.slider("Match Tolerance (%)", 1, 15, 5)
+            one_low = int(base_value * (1 - tolerance / 100))
+            one_high = int(base_value * (1 + tolerance / 100))
+
+            one_for_one = df[(df["KTC_Value"] >= one_low) & (df["KTC_Value"] <= one_high) & (df["Player_Sleeper"] != selected_player)]
+            one_for_one['Team'] = one_for_one['Team'].fillna('').apply(
+                lambda abbr: f"<img src='https://a.espncdn.com/i/teamlogos/nfl/500/{abbr}.png' width='30'/> {abbr}" if abbr else abbr)
+
+            # 2-for-1 Trades
+            adjusted_low = int(adjusted_value * (1 - tolerance / 100))
+            adjusted_high = int(adjusted_value * (1 + tolerance / 100))
+            results = []
+
+            for team_owner in df["Team_Owner"].unique():
+                if team_owner == row["Team_Owner"]:
+                    continue
+                team_players = df[df["Team_Owner"] == team_owner]
+                combos = combinations(team_players.iterrows(), 2)
+                for (i1, p1), (i2, p2) in combos:
+                    total = p1["KTC_Value"] + p2["KTC_Value"]
+                    if p1["Player_Sleeper"] == selected_player or p2["Player_Sleeper"] == selected_player:
+                        continue
+                    if p1["KTC_Value"] > base_value or p2["KTC_Value"] > base_value:
+                        continue
+                    if adjusted_low <= total <= adjusted_high:
+                        results.append({
+                            "Owner": team_owner,
+                            "Player 1": p1["Player_Sleeper"],
+                            "Player 2": p2["Player_Sleeper"],
+                            "Total KTC": total
+                        })
+
+            # Display 1-for-1
+            with st.expander("1-for-1 Trade Suggestions", expanded=True):
+                if not one_for_one.empty:
+                    centered_html = f"""
+                    <div style='display: flex; justify-content: center;'>
+                      <div style='text-align: center;'>
+                        {one_for_one[['Player_Sleeper', 'Position', 'Team', 'KTC_Value', 'Team_Owner']].to_html(escape=False, index=False)}
+                      </div>
+                    </div>
+                    """
+                    st.markdown(centered_html, unsafe_allow_html=True)
+                else:
+                    st.markdown("No good 1-for-1 trade suggestions found.")
+
+            # Display 2-for-1
+            with st.expander("2-for-1 Trade Suggestions", expanded=True):
+                if results:
+                    suggestions_df = pd.DataFrame(results)
+                    st.dataframe(suggestions_df)
+                else:
+                    st.markdown("No good 2-for-1 trade suggestions found.")
+
+    except Exception as e:
+        st.error(f"Something went wrong: {e}")
