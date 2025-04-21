@@ -90,6 +90,14 @@ st.sidebar.header("Import Your League")
 username = st.sidebar.text_input("Enter your Sleeper username").strip()
 username_lower = username.lower()
 
+# 👇 ADDED SLIDERS TO SIDEBAR
+with st.sidebar:
+    st.markdown("---")
+    st.subheader("Trade Settings")
+    tolerance = st.slider("Match Tolerance (%)", 1, 15, 5)
+    qb_premium_setting = st.slider("QB Premium Bonus", 0, 1500, 300, step=25,
+                                   help="Extra value added to QBs for trade calculations.")
+
 league_id = None
 league_options = {}
 df = pd.DataFrame()
@@ -127,11 +135,6 @@ if username:
                 selected_id = df[df["Player_Sleeper"] == selected_player].iloc[0]["Sleeper_Player_ID"]
                 headshot_url = f"https://sleepercdn.com/content/nfl/players/{selected_id}.jpg"
                 st.markdown(f"<div style='text-align:center'><img src='{headshot_url}' width='120'/></div>", unsafe_allow_html=True)
-
-            tolerance = st.slider("Match Tolerance (%)", 1, 15, 5)
-            st.markdown("**QB Premium**")
-            st.caption("How much does your league value QBs?")
-            qb_premium_setting = st.slider("QB Premium Bonus", 0, 1500, 300, step=25)
 
             if selected_player:
                 row = df[df["Player_Sleeper"] == selected_player].iloc[0]
