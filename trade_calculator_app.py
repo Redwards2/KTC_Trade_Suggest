@@ -90,17 +90,37 @@ st.sidebar.header("Import Your League")
 username = st.sidebar.text_input("Enter your Sleeper username").strip()
 username_lower = username.lower()
 
-# 👇 ADDED SLIDERS TO SIDEBAR
-with st.sidebar:
-    st.markdown("---")
-    st.subheader("Trade Settings")
-    tolerance = st.slider("Match Tolerance (%)", 1, 15, 5)
-    qb_premium_setting = st.slider("QB Premium Bonus", 0, 1500, 300, step=25,
-                                   help="Extra value added to QBs for trade calculations.")
-
 league_id = None
 league_options = {}
 df = pd.DataFrame()
+
+if username:
+    try:
+        user_info_url = f"https://api.sleeper.app/v1/user/{username}"
+        user_response = requests.get(user_info_url, timeout=10)
+        user_response.raise_for_status()
+        user_id = user_response.json().get("user_id")
+
+        leagues_url = f"https://api.sleeper.app/v1/user/{user_id}/leagues/nfl/2025"
+        response = requests.get(leagues_url)
+        response.raise_for_status()
+        leagues = response.json()
+
+        league_options = {league['name']: league['league_id'] for league in leagues}
+        selected_league_name = st.sidebar.selectbox("Select a league", list(league_options.keys()))
+        league_id = league_options[selected_league_name]
+
+    except Exception as e:
+        st.sidebar.error(f"❌ Failed to load leagues: {e}")
+        league_id = None
+
+    st.sidebar.markdown("---")
+    st.sidebar.subheader("Trade Settings")
+    tolerance = st.sidebar.slider("Match Tolerance (%)", 1, 15, 5)
+    st.sidebar.caption("How much does your league value QBs?")
+    qb_premium_setting = st.sidebar.slider("QB Premium Bonus", 0, 1500, 300, step=25)
+else:
+    st.sidebar.info("Enter your Sleeper username to get started.")
 
 if username:
     try:
