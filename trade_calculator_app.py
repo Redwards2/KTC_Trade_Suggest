@@ -68,13 +68,32 @@ def stud_bonus(value):
 # --------------------
 st.set_page_config(page_title="KTC Trade Suggest", layout="wide")
 
-st.markdown(
-    """
-    <h1 style='text-align:center; color:#4FC3F7;'>Trade Suggestions (Based off KTC Values)</h1>
-    <h4 style='text-align:center; color:#BBBBBB;'>Adding draft picks soon</h4>
-    """,
-    unsafe_allow_html=True
-)
+# Sticky container styling
+st.markdown("""
+<style>
+.sticky-container {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    background-color: #0e1117;
+    z-index: 999;
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #444;
+    margin-bottom: 1rem;
+}
+.css-1c7y2kd:focus-visible {
+    outline: none;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div class="sticky-container">
+<h1 style='text-align:center; color:#4FC3F7;'>Trade Suggestions (Based off KTC Values)</h1>
+<h4 style='text-align:center; color:#BBBBBB;'>Adding draft picks soon</h4>
+</div>
+""", unsafe_allow_html=True)
 
 username = st.sidebar.text_input("Enter your Sleeper username").strip()
 username_lower = username.lower()
@@ -105,12 +124,10 @@ if username:
             selected_player = None
             selected_id = None
 
-            # Pre-select player to load image before displaying dropdown
             if len(player_list) > 0:
-                selected_player = st.selectbox("Select a player to trade away:", player_list, label_visibility="visible")
+                selected_player = st.selectbox("Select a player to trade away:", player_list)
                 selected_id = df[df["Player_Sleeper"] == selected_player].iloc[0]["Sleeper_Player_ID"]
 
-            # Display player image
             if selected_id:
                 headshot_url = f"https://sleepercdn.com/content/nfl/players/{selected_id}.jpg"
                 st.markdown(
