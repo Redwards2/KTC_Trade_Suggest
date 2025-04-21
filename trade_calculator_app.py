@@ -110,6 +110,9 @@ if username:
         selected_league_name = st.sidebar.selectbox("Select a league", list(league_options.keys()), key="league_select")
         league_id = league_options[selected_league_name]
 
+        ktc_df = pd.read_csv("ktc_values.csv", encoding="utf-8-sig")
+        df, player_pool = load_league_data(league_id, ktc_df)
+
     except Exception as e:
         st.sidebar.error(f"❌ Failed to load leagues: {e}")
         league_id = None
