@@ -1,3 +1,4 @@
 #!/bin/bash
-# This script ensures the required browser drivers for Playwright are installed
+echo "🔧 Installing Playwright browser drivers..."
 playwright install
+echo "✅ Done installing!"
