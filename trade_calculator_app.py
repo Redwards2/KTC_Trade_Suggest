@@ -77,6 +77,13 @@ def dud_bonus(value):
 # Streamlit UI
 # --------------------
 st.set_page_config(page_title="KTC Trade Suggest", layout="wide")
+st.markdown("""
+<style>
+    th, td {
+        text-align: center !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 username = st.sidebar.text_input("Enter your Sleeper username").strip()
 username_lower = username.lower()
