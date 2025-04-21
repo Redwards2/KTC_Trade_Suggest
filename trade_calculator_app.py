@@ -163,7 +163,7 @@ if username:
 
                 if not one_for_one.empty:
                     one_for_one['Team'] = one_for_one['Team'].fillna('').apply(lambda abbr: f"<img src='https://a.espncdn.com/i/teamlogos/nfl/500/{abbr}.png' width='30'/> {abbr}" if abbr else abbr)
-                    st.markdown(one_for_one[['Player_Sleeper', 'Position', 'Team', 'KTC_Value', 'Team_Owner']].to_html(escape=False, index=False), unsafe_allow_html=True)
+                    st.markdown(f"<div style='text-align:center'>{one_for_one[['Player_Sleeper', 'Position', 'Team', 'KTC_Value', 'Team_Owner']].to_html(escape=False, index=False)}</div>", unsafe_allow_html=True)
                 else:
                     st.markdown("No good 1-for-1 trade suggestions found.")
 
