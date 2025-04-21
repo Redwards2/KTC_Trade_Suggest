@@ -64,6 +64,15 @@ def stud_bonus(value):
     return 0
 
 # --------------------
+# Dud Bonus Function (Negative Bonus for Low Value Players)
+# --------------------
+def dud_bonus(value):
+    if value <= 1000: return -800
+    elif value <= 1500: return -600
+    elif value <= 2000: return -400
+    return 0
+
+# --------------------
 # Streamlit UI
 # --------------------
 st.set_page_config(page_title="KTC Trade Suggest", layout="wide")
@@ -172,6 +181,7 @@ if username:
                             total = p1["KTC_Value"] + p2["KTC_Value"]
                             if p1["Position"] == "QB" and p1["Player_Sleeper"] in top_qbs: total += qb_premium_setting
                             if p2["Position"] == "QB" and p2["Player_Sleeper"] in top_qbs: total += qb_premium_setting
+                            total += dud_bonus(p1["KTC_Value"]) + dud_bonus(p2["KTC_Value"])
                             if two_low <= total <= two_high:
                                 results.append({
                                     "Owner": team_owner,
