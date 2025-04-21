@@ -157,7 +157,13 @@ if username:
                     ]
 
                     one_names = set(one_for_one["Player_Sleeper"])
-                    st.dataframe(one_for_one[["Player_Sleeper", "Position", "Team", "KTC_Value", "Team_Owner"]])
+
+                    if not one_for_one.empty:
+                        one_for_one["Logo"] = one_for_one["Team"].apply(lambda x: f"<img src='https://a.espncdn.com/i/teamlogos/nfl/500/{x.lower()}.png' width='32'/>" if x else "")
+                        one_for_one["Team_Logo"] = one_for_one["Logo"] + " " + one_for_one["Team"]
+                        st.write(one_for_one[["Player_Sleeper", "Position", "Team_Logo", "KTC_Value", "Team_Owner"]].to_html(escape=False, index=False), unsafe_allow_html=True)
+                    else:
+                        st.markdown("No 1-for-1 trades found.")
 
                 with st.expander("📦 2-for-1 Trade Suggestions"):
                     two_low = int(adjusted_value * (1 - tolerance / 100))
