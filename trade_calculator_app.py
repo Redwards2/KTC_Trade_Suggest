@@ -88,15 +88,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<div class="sticky-container">
-<h1 style='text-align:center; color:#4FC3F7;'>Trade Suggestions (Based off KTC Values)</h1>
-<h4 style='text-align:center; color:#BBBBBB;'>Adding draft picks soon</h4>
-</div>
-""", unsafe_allow_html=True)
-
 username = st.sidebar.text_input("Enter your Sleeper username").strip()
 username_lower = username.lower()
+
+selected_player = None
+selected_id = None
+headshot_html = ""
 
 if username:
     try:
@@ -121,23 +118,28 @@ if username:
             user_players = df[df["Team_Owner"].str.lower() == username_lower]
             player_list = user_players["Player_Sleeper"].sort_values().unique()
 
-            selected_player = None
-            selected_id = None
+            st.markdown("""
+            <div class="sticky-container">
+                <h1 style='text-align:center; color:#4FC3F7;'>Trade Suggestions (Based off KTC Values)</h1>
+                <h4 style='text-align:center; color:#BBBBBB;'>Adding draft picks soon</h4>
+            """, unsafe_allow_html=True)
 
             if len(player_list) > 0:
                 selected_player = st.selectbox("Select a player to trade away:", player_list)
                 selected_id = df[df["Player_Sleeper"] == selected_player].iloc[0]["Sleeper_Player_ID"]
 
-            if selected_id:
-                headshot_url = f"https://sleepercdn.com/content/nfl/players/{selected_id}.jpg"
-                st.markdown(
-                    f"""
-                    <div style='display: flex; justify-content: center;'>
-                        <img src="{headshot_url}" width="120" style="border-radius: 10px; margin-bottom: 12px;"/>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+                if selected_id:
+                    headshot_url = f"https://sleepercdn.com/content/nfl/players/{selected_id}.jpg"
+                    st.markdown(
+                        f"""
+                        <div style='display: flex; justify-content: center;'>
+                            <img src="{headshot_url}" width="120" style="border-radius: 10px; margin: 0 auto;"/>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+            st.markdown("</div>", unsafe_allow_html=True)
 
             tolerance = st.slider("Match Tolerance (%)", 1, 15, 5, help="How closely values must match to be considered a fair trade")
             st.markdown("**QB Premium**")
