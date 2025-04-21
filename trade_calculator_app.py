@@ -174,9 +174,7 @@ if username:
                 with col2:
                     if st.button("Clear Filter"):
                         player_filter_name = ""
-with col2:
-    if st.button("Clear Filter"):
-        player_filter_name = ""
+
                 two_low = int(adjusted_value * (1 - tolerance / 100))
                 two_high = int(adjusted_value * (1 + tolerance / 100))
 
