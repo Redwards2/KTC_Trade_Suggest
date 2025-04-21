@@ -125,25 +125,6 @@ if username:
 else:
     st.sidebar.info("Enter your Sleeper username to get started.")
 
-if username:
-    try:
-        user_info_url = f"https://api.sleeper.app/v1/user/{username}"
-        user_response = requests.get(user_info_url, timeout=10)
-        user_response.raise_for_status()
-        user_id = user_response.json().get("user_id")
-
-        leagues_url = f"https://api.sleeper.app/v1/user/{user_id}/leagues/nfl/2025"
-        response = requests.get(leagues_url)
-        response.raise_for_status()
-        leagues = response.json()
-
-        league_options = {league['name']: league['league_id'] for league in leagues}
-        selected_league_name = st.sidebar.selectbox("Select a league", list(league_options.keys()))
-        league_id = league_options[selected_league_name]
-
-        ktc_df = pd.read_csv("ktc_values.csv", encoding="utf-8-sig")
-        df, player_pool = load_league_data(league_id, ktc_df)
-
         if not df.empty:
             top_qbs = df[df["Position"] == "QB"].sort_values("KTC_Value", ascending=False).head(30)["Player_Sleeper"].tolist()
 
