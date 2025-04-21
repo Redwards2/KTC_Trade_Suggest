@@ -88,17 +88,24 @@ thead tr th, tbody tr td {
 
 # ... [rest of the existing unchanged setup code remains above here] ...
 
-                if not one_for_one.empty:
-                    one_for_one['Team'] = one_for_one['Team'].fillna('').apply(lambda abbr: f"<img src='https://a.espncdn.com/i/teamlogos/nfl/500/{abbr}.png' width='30'/> {abbr}" if abbr else abbr)
-                    centered_html = f"""
-                    <div style='display: flex; justify-content: center;'>
-                      <div style='text-align: center;'>
-                        {one_for_one[['Player_Sleeper', 'Position', 'Team', 'KTC_Value', 'Team_Owner']].to_html(escape=False, index=False)}
-                      </div>
-                    </div>
-                    """
-                    st.markdown(centered_html, unsafe_allow_html=True)
-                else:
-                    st.markdown("No good 1-for-1 trade suggestions found.")
+with st.expander("1-for-1 Trade Suggestions", expanded=True):
+    if not one_for_one.empty:
+        one_for_one['Team'] = one_for_one['Team'].fillna('').apply(
+            lambda abbr: f"<img src='https://a.espncdn.com/i/teamlogos/nfl/500/{abbr}.png' width='30'/> {abbr}" if abbr else abbr)
+        centered_html = f"""
+        <div style='display: flex; justify-content: center;'>
+          <div style='text-align: center;'>
+            {one_for_one[['Player_Sleeper', 'Position', 'Team', 'KTC_Value', 'Team_Owner']].to_html(escape=False, index=False)}
+          </div>
+        </div>
+        """
+        st.markdown(centered_html, unsafe_allow_html=True)
+    else:
+        st.markdown("No good 1-for-1 trade suggestions found.")
 
-# ... [the remaining logic stays unchanged below this] ...
+with st.expander("2-for-1 Trade Suggestions", expanded=True):
+    if results:
+        suggestions_df = pd.DataFrame(results)
+        st.dataframe(suggestions_df)
+    else:
+        st.markdown("No good 2-for-1 trade suggestions found.")
