@@ -120,7 +120,7 @@ if username:
             player_list = user_players["Player_Sleeper"].sort_values().unique()
 
             st.title("Trade Suggestions (Based off KTC Values)")
-            st.caption("Adding draft picks soon")
+            st.caption("Adding draft picks soon, IDP values coming at a later date as well")
 
             selected_player = st.selectbox("Select a player to trade away:", player_list)
             if selected_player:
