@@ -119,7 +119,7 @@ if username:
             user_players = df[df["Team_Owner"].str.lower() == username_lower]
             player_list = user_players["Player_Sleeper"].sort_values().unique()
 
-            st.title("Trade Suggestions (Based off KTC Values)")
+            st.markdown("<h1 style='text-align:center; color:#4da6ff;'>Trade Suggestions (Based off KTC Values)</h1>", unsafe_allow_html=True)
             st.caption("Adding draft picks soon, IDP values coming at a later date as well")
 
             selected_player = st.selectbox("Select a player to trade away:", player_list)
@@ -141,7 +141,7 @@ if username:
                 qb_premium = qb_premium_setting if row["Position"] == "QB" and selected_player in top_qbs else 0
                 adjusted_value = base_value + bonus + qb_premium
 
-                st.subheader("Selected Player Details")
+                st.markdown("<h3 style='text-align:center;'>Selected Player Details</h3>", unsafe_allow_html=True)
                 st.markdown(f"- **Player:** {selected_player}")
                 st.markdown(f"- **Team Owner:** {owner}")
                 st.markdown(f"- **Raw KTC Value:** {base_value}")
@@ -149,7 +149,7 @@ if username:
                 st.markdown(f"- **QB Premium:** +{qb_premium if qb_premium else 0}")
                 st.markdown(f"- **Adjusted 2-for-1 Value:** {adjusted_value}")
 
-                st.subheader("1-for-1 Trade Suggestions")
+                st.markdown("<h3 style='text-align:center;'>1-for-1 Trade Suggestions</h3>", unsafe_allow_html=True)
                 one_low = int(base_value * (1 - tolerance / 100))
                 one_high = int(base_value * (1 + tolerance / 100))
 
@@ -162,11 +162,12 @@ if username:
                 one_names = set(one_for_one["Player_Sleeper"])
 
                 if not one_for_one.empty:
-                    st.dataframe(one_for_one[["Player_Sleeper", "Position", "Team", "KTC_Value", "Team_Owner"]])
+                    one_for_one['Team'] = one_for_one['Team'].fillna('').apply(lambda abbr: f"<img src='https://a.espncdn.com/i/teamlogos/nfl/500/{abbr}.png' width='30'/> {abbr}" if abbr else abbr)
+                    st.markdown(one_for_one[['Player_Sleeper', 'Position', 'Team', 'KTC_Value', 'Team_Owner']].to_html(escape=False, index=False), unsafe_allow_html=True)
                 else:
                     st.markdown("No good 1-for-1 trade suggestions found.")
 
-                st.subheader("2-for-1 Trade Suggestions")
+                st.markdown("<h3 style='text-align:center;'>2-for-1 Trade Suggestions</h3>", unsafe_allow_html=True)
                 two_low = int(adjusted_value * (1 - tolerance / 100))
                 two_high = int(adjusted_value * (1 + tolerance / 100))
 
