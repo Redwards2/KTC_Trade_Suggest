@@ -82,8 +82,20 @@ st.markdown("""
     border-bottom: 1px solid #444;
     margin-bottom: 1rem;
 }
-.css-1c7y2kd:focus-visible {
-    outline: none;
+.card {
+    background-color: #1c1c1e;
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    border: 1px solid #333;
+}
+.card h4 {
+    margin: 0;
+    color: #FFD700;
+}
+.card p {
+    margin: 0.3rem 0;
+    color: #bbb;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -204,10 +216,15 @@ if username:
                                 })
 
                     if results:
-                        df_res = pd.DataFrame(results)
-                        df_res = df_res.sort_values(by="Total KTC", ascending=False)
-                        df_res = df_res[df_res["Total KTC"] > 0]
-                        st.dataframe(df_res)
+                        st.markdown("---")
+                        for trade in results:
+                            st.markdown(f"""
+                                <div class="card">
+                                    <h4>{trade['Owner']}</h4>
+                                    <p><b>{trade['Player 1']}</b> + <b>{trade['Player 2']}</b></p>
+                                    <p>Total KTC: {trade['Total KTC']}</p>
+                                </div>
+                            """, unsafe_allow_html=True)
                     else:
                         st.markdown("No good 2-for-1 trade suggestions found.")
 
