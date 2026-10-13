@@ -569,8 +569,15 @@ def main():
         tol_f = tol / 100.0
         owner = lambda a: teams[a["roster_id"]]["label"]
 
+        # Owner filter: narrows both tables to one trade partner ("All owners" = no filter).
+        partner_labels = sorted({teams[rid]["label"] for rid in teams
+                                 if rid != my_rid and not teams[rid]["orphan"]}, key=str.lower)
+        pick_owner = st.selectbox("Filter by team owner", ["All owners"] + partner_labels,
+                                  key=f"owner_filter_{lid}")
+        targets = others if pick_owner == "All owners" else [a for a in others if owner(a) == pick_owner]
+
         with st.expander(f"📈 {n}-for-1 Trade Suggestions", expanded=True):
-            rows = sorted(one_for_one(my_value, others, tol_f), key=lambda a: a["value"], reverse=True)
+            rows = sorted(one_for_one(my_value, targets, tol_f), key=lambda a: a["value"], reverse=True)
             if rows:
                 st.dataframe([{"Player": a["name"], "Position": a["pos"], "Team": a["nfl"], "KTC": a["ktc"],
                                "Adjusted": a["value"], "Difference": round(a["value"] - my_value),
@@ -579,7 +586,7 @@ def main():
                 st.write("No 1-for-1 trades found in that range.")
 
         with st.expander(f"👥 {n}-for-2 Trade Suggestions", expanded=True):
-            pairs = sorted(one_for_two(my_value, others, tol_f, cons), key=lambda t: t[2], reverse=True)
+            pairs = sorted(one_for_two(my_value, targets, tol_f, cons), key=lambda t: t[2], reverse=True)
             if pairs:
                 st.dataframe([{"Team Owner": owner(a),
                                "Player 1": f"{a['name']} ({a['pos']}, KTC: {a['ktc']:,})",
